@@ -124,8 +124,6 @@ std::vector<glm::vec3> setupVertexArray(const std::vector<glm::vec3>& vertices, 
     return vertexArray;
 }
 
-// ...
-
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
 
