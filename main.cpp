@@ -9,6 +9,7 @@
 
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 800;
+float rotationAngles[3] = { 180.0f, 0.0f, 0.0f };
 
 void drawPixel(SDL_Renderer* renderer, int x, int y) {
     SDL_RenderDrawPoint(renderer, x, y);
@@ -180,12 +181,15 @@ int main() {
         float translationX = (WINDOW_WIDTH - modelWidth * scale) * 0.5f;
         float translationY = (WINDOW_HEIGHT - modelHeight * scale) * 0.5f;
 
+        glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), glm::radians(rotationAngles[0]), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotación en el eje X
+
         for (const auto& face : faces) {
             std::vector<glm::vec3> polygonVertices;
             for (const auto& index : face.vertexIndices) {
-                glm::vec3 vertex = vertices[index[0] - 1]; // Adjust for 1-based indexing in OBJ files
-                vertex.x = (modelWidth - (vertex.x - minX)) * scale + translationX; // Espejar horizontalmente
-                vertex.y = (vertex.y - minY) * scale + translationY;
+                glm::vec3 vertex = vertices[index[0] - 1];
+                vertex = glm::vec3(rotationMatrix * glm::vec4(vertex, 1.0f));
+                vertex.x = (modelWidth - (vertex.x - minX)) * scale + translationX;
+                vertex.y = (-vertex.y - minY) * scale + translationY;
                 polygonVertices.push_back(vertex);
             }
 
@@ -193,6 +197,10 @@ int main() {
         }
 
         SDL_RenderPresent(renderer);
+
+        for (int i = 0; i < 3; ++i) {
+            rotationAngles[i] += 1.0f; 
+        }
     }
 
     SDL_DestroyRenderer(renderer);
